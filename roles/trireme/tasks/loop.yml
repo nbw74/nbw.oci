@@ -63,7 +63,7 @@
         label: "{{ _tcm.name }}"
       template:
         src: container.j2
-        dest: "{{ _trireme_pod_user_quadlet_dir }}/{{ _tcm.name }}.container"
+        dest: "{{ _trireme_pod_user_quadlet_dir }}/{{ _tpm.metadata.name }}-{{ _tcm.name }}.container"
 
     - name: Network conditional block
       when: _tpm.spec.network is defined
@@ -79,6 +79,7 @@
               files:
                 - "{{ _tpm.spec.network }}.yml"
                 - "{{ _tpm.spec.network }}.yaml"
+              skip: true
 
         - name: "Template network unit-file | {{ _trireme_pod.pod }}"  # noqa risky-file-permissions
           template:
@@ -86,7 +87,7 @@
             dest: "{{ _trireme_pod_user_quadlet_dir }}/{{ _tpm.spec.network }}.network"
 
 - name: Become section
-  become_user: "{{ _podman_quadlet_user }}"
+  become_user: "{{ _trireme_pod.user.name }}"
   become: true
   block:
     - name: "Prune dangling images | {{ _trireme_pod.pod }}"
@@ -105,4 +106,10 @@
       changed_when: true
       debug:
         var: __trireme_quadlet
+
+    - name: "Service (re)started for pod changes update | {{ _trireme_pod.pod }}"
+      systemd_service:
+        name: "pod-{{ _tpm.metadata.name }}.service"
+        state: "{{ (__trireme_env_files is changed) | ternary('restarted', 'started') }}"
+        scope: "{{ (_trireme_pod.user.name == 'root') | ternary('system', 'user') }}"
 ...
