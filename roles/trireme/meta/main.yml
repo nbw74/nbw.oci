@@ -1,0 +1,17 @@
+---
+galaxy_info:
+  role_name: trireme
+  description: Trireme is an Ansible orchestrator for the Podman Quadlet
+  company: NoCompany
+  author: Nikolay Mesropyan
+  min_ansible_version: "2.18"
+  license: PolyForm-Noncommercial-1.0.0
+
+  platforms:
+    - name: EL
+      versions:
+        - "9"
+        - "10"
+
+dependencies: []
+...

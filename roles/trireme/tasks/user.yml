@@ -1,0 +1,34 @@
+---
+- name: "Create or update pod user {{ _trireme_pod_user.name }}"
+  user:
+    name: "{{ _trireme_pod_user.name }}"
+    comment: "{{ trireme__cn }} ansible role"
+    home: "/var/lib/trireme/{{ _trireme_pod_user.name }}"
+    uid: "{{ _trireme_pod_user.uid | d(omit) }}"
+    shell: /bin/bash
+    system: true
+
+- name: "Get lingering status for user {{ _trireme_pod_user.name }}"
+  register: __trireme_linger_stat
+  stat:
+    path: "/var/lib/systemd/linger/{{ _trireme_pod_user.name }}"
+    get_attributes: false
+    get_checksum: false
+    get_mime: false
+
+- name: "Enable lingering for user {{ _trireme_pod_user.name }}"
+  when: not __trireme_linger_stat.stat.exists
+  command:
+    argv:
+      - loginctl
+      - enable-linger
+      - "{{ _trireme_pod_user.name }}"
+
+- name: "Create quadlets dir for user {{ _trireme_pod_user.name }}"
+  file:
+    path: "/var/lib/trireme/{{ _trireme_pod_user.name }}/quadlets"
+    state: directory
+    owner: "{{ _trireme_pod_user.name }}"
+    group: "{{ _trireme_pod_user.name }}"
+    mode: "0750"
+...

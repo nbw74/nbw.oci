@@ -1,0 +1,3 @@
+---
+trireme__cn: "{{ ansible_role_name|replace('.', '-') }}"
+...

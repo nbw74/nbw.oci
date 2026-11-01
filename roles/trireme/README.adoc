@@ -1,0 +1,29 @@
+= trireme
+:toc: auto
+:source-language: yaml
+
+Trireme is an Ansible orchestrator for the Podman Quadlet
+
+== Requirements
+
+* *gather_subset:* `[ 'min' ]`
+* *Installed collections:*
+** namespace.collection
+
+== Role Variables
+
+See link:meta/argument_specs.yml[argument specs]
+
+== Dependencies
+
+None
+
+== Example Playbook
+
+See link:tests/antest/site.yml[test site.yml].
+
+== Example Variables
+
+See link:tests/antest/inventory/hosts.yml[test hosts.yml]
+
+// END

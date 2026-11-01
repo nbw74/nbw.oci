@@ -1,0 +1,108 @@
+---
+- name: "Set env and cfg dir path fact | {{ _trireme_pod.pod }}"
+  set_fact:
+    _trireme_pod_cfg_dir: "/var/lib/trireme/{{ _trireme_pod.user.name }}/{{ _trireme_pod.pod }}"
+    _trireme_pod_user_quadlet_dir: "/var/lib/trireme/{{ _trireme_pod.user.name }}/quadlets/{{ _trireme_pod.pod }}"
+
+- name: "Read pod manifest | {{ _trireme_pod.pod }}"
+  include_vars:
+    file: "{{ item }}"
+    name: _tpm
+  with_first_found:
+    - paths:
+        - "{{ inventory_dir }}/trireme/pods"
+        - "{{ inventory_dir }}/trireme/pod"
+      files:
+        - "{{ _trireme_pod.pod }}.yml"
+        - "{{ _trireme_pod.pod }}.yaml"
+
+- name: "Assert that pod name is consistent between filename and metadata | {{ _trireme_pod.pod }}"
+  assert:
+    that:
+      - "_trireme_pod.pod == _tpm.metadata.name"
+    fail_msg: "Pod name mismatch: filename='{{ _trireme_pod.pod }}' metadata='{{ _tpm.metadata.name }}'"
+
+- name: "Create env / cfg dir and quadlet dir | {{ _trireme_pod.pod }}"
+  loop:
+    - "{{ _trireme_pod_cfg_dir }}"
+    - "{{ _trireme_pod_user_quadlet_dir }}"
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ _trireme_pod.user.name }}"
+    group: "{{ _trireme_pod.user.name }}"
+    mode: "0750"
+
+- name: Module defaults block
+  module_defaults:
+    template:
+      owner: "{{ _trireme_pod.user.name }}"
+      group: "{{ _trireme_pod.user.name }}"
+      mode: "0640"
+  block:
+    - name: "Template env files for pod | {{ _trireme_pod.pod }}"  # noqa risky-file-permissions
+      register: __trireme_env_files
+      no_log: "{{ trireme_no_log_override|ternary(false, true) }}"
+      loop: "{{ _trireme_pod.env_templates }}"
+      loop_control:
+        loop_var: _trireme_env
+        label: "{{ _trireme_env.dest | d (_trireme_env.src) }}"
+      template:
+        src: "{{ inventory_dir }}/trireme/env/{{ _trireme_env }}.j2"
+        dest: "{{ _trireme_pod_cfg_dir }}/{{ _trireme_env.dest | d(_trireme_env.src) }}.env"
+
+    - name: "Template pod unit-file | {{ _trireme_pod.pod }}"  # noqa risky-file-permissions
+      template:
+        src: pod.j2
+        dest: "{{ _trireme_pod_user_quadlet_dir }}/{{ _trireme_pod.pod }}.pod"
+
+    - name: "Template containers unit-files | {{ _trireme_pod.pod }}"  # noqa risky-file-permissions
+      loop: "{{ _tpm.spec.containers }}"
+      loop_control:
+        loop_var: _tcm
+        label: "{{ _tcm.name }}"
+      template:
+        src: container.j2
+        dest: "{{ _trireme_pod_user_quadlet_dir }}/{{ _tcm.name }}.container"
+
+    - name: Network conditional block
+      when: _tpm.spec.network is defined
+      block:
+        - name: "Read network manifest | {{ _trireme_pod.pod }}"
+          include_vars:
+            file: "{{ item }}"
+            name: _tnm
+          with_first_found:
+            - paths:
+                - "{{ inventory_dir }}/trireme/networks"
+                - "{{ inventory_dir }}/trireme/network"
+              files:
+                - "{{ _tpm.spec.network }}.yml"
+                - "{{ _tpm.spec.network }}.yaml"
+
+        - name: "Template network unit-file | {{ _trireme_pod.pod }}"  # noqa risky-file-permissions
+          template:
+            src: network.j2
+            dest: "{{ _trireme_pod_user_quadlet_dir }}/{{ _tpm.spec.network }}.network"
+
+- name: Become section
+  become_user: "{{ _podman_quadlet_user }}"
+  become: true
+  block:
+    - name: "Prune dangling images | {{ _trireme_pod.pod }}"
+      containers.podman.podman_prune:
+        image: true
+        image_filters:
+          dangling_only: true
+
+    - name: "Quadlet installed | {{ _trireme_pod.pod }}"
+      register: __trireme_quadlet
+      containers.podman.podman_quadlet:
+        src: "{{ _trireme_pod_user_quadlet_dir }}"
+
+    - name: "Print podman_quadlet module output | {{ _trireme_pod.pod }}"
+      when: __trireme_quadlet is changed
+      changed_when: true
+      debug:
+        var: __trireme_quadlet
+...

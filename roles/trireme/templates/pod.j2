@@ -1,0 +1,32 @@
+# THIS FILE MANAGED BY ANSIBLE
+[Unit]
+Description={{ _tpm.metadata.description }}
+{% with _unit =  _tpm.spec.iniSections.unit %}
+{% include 'includes/1.j2' %}
+{% endwith %}
+
+[Pod]
+ServiceName=pod-{{ _trireme_pod.metadata.name }}
+{% with _port = _tpm.spec.publishPort %}
+{%  if _port is defined %}
+{%    if _port | type_debug == 'list' %}
+{%	for item in _port %}
+PublishPort={{ item }}
+{%	endfor %}
+{%    else %}
+PublishPort={{ _port }}
+{%    endif %}
+{%  endif %}
+{% endwith %}
+{% with _unit =  _tpm.spec.iniSections.pod %}
+{% include 'includes/1.j2' %}
+{% endwith %}
+PodmanArgs=--exit-policy=continue
+
+[Service]
+{% with _unit =  _tpm.spec.iniSections.service %}
+{% include 'includes/1.j2' %}
+{% endwith %}
+
+[Install]
+WantedBy=default.target

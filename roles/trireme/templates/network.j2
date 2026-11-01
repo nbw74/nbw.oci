@@ -1,0 +1,12 @@
+# THIS FILE MANAGED BY ANSIBLE
+[Unit]
+Description={{ _tnm.metadata.description }}
+
+[Network]
+Subnet={{ _tnm.spec.subnet }}
+{% with _unit =  _tnm.iniSections.network %}
+{% include 'includes/1.j2' %}
+{% endwith %}
+
+[Install]
+WantedBy=network.target

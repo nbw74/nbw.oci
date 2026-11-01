@@ -1,0 +1,11 @@
+{%  if _unit is defined %}
+{%    for key, value in _unit | dictsort %}
+{%	if value | type_debug == 'list' %}
+{%	  for _sub in value %}
+{{ key | capitalize }}={{ _sub }}
+{%	  endfor %}
+{%	else %}
+{{ key | capitalize }}={{ value|string }}
+{%	endif %}
+{%    endfor %}
+{%  endif %}

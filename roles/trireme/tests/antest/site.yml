@@ -1,0 +1,20 @@
+---
+- name: Play wait for connection
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Wait for connection
+      check_mode: false
+      wait_for_connection:
+        timeout: 10
+
+- name: Local role testing
+  hosts: all
+  gather_subset: [ 'min' ]
+  become: true
+  diff: true
+
+  roles:
+    - nbw.oci.trireme
+...
