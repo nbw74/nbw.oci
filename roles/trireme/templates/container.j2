@@ -1,9 +1,11 @@
 # THIS FILE MANAGED BY ANSIBLE
 [Unit]
-Description={{ _tcm.description |d (_trireme_pod.metadata.description) }}
-{% with _unit =  _tcm.iniSections.unit %}
-{% include 'includes/1.j2' %}
-{% endwith %}
+Description={{ _tcm.description | d(_tpm.metadata.description) }}
+{% if  _tcm.iniSections.unit is defined %}
+{%  with _i =  _tcm.iniSections.unit %}
+{%    include 'includes/1.j2' %}
+{%  endwith %}
+{% endif %}
 
 [Container]
 Pod={{ _tpm.metadata.name }}.pod
@@ -26,14 +28,18 @@ Volume={{ _path.path }}:{{ _path.mount }}{{ (_path.options is defined) | ternary
 Volume={{ _vol.name }}:{{ _vol.mount }}{{ (_vol.options is defined) | ternary(':' ~ _vol.options, None) }}
 {%  endfor %}
 {% endif %}
-{% with _unit =  _tcm.iniSections.container %}
-{% include 'includes/1.j2' %}
-{% endwith %}
+{% if  _tcm.iniSections.container is defined %}
+{%  with _i =  _tcm.iniSections.container %}
+{%    include 'includes/1.j2' %}
+{%  endwith %}
+{% endif %}
+{% if  _tcm.iniSections.service is defined %}
 
 [Service]
-{% with _unit =  _tcm.iniSections.service %}
-{% include 'includes/1.j2' %}
-{% endwith %}
+{%  with _i =  _tcm.iniSections.service %}
+{%    include 'includes/1.j2' %}
+{%  endwith %}
+{% endif %}
 
 [Install]
 WantedBy=default.target

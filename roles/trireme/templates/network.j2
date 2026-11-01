@@ -4,9 +4,11 @@ Description={{ _tnm.metadata.description }}
 
 [Network]
 Subnet={{ _tnm.spec.subnet }}
-{% with _unit =  _tnm.iniSections.network %}
-{% include 'includes/1.j2' %}
-{% endwith %}
+{% if  _tnm.spec.iniSections.network is defined %}
+{%  with _i =  _tnm.iniSections.network %}
+{%    include 'includes/1.j2' %}
+{%  endwith %}
+{% endif %}
 
 [Install]
 WantedBy=network.target

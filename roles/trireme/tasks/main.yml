@@ -28,7 +28,7 @@
   loop: "{{ trireme_pods }}"
   loop_control:
     loop_var: _trireme_pod
-    label: "{{ _trireme_pod.name }}@{{ _trireme_pod.user }}"
+    label: "{{ _trireme_pod.pod }}@{{ _trireme_pod.user }}"
   include_tasks:
     file: loop.yml
 ...

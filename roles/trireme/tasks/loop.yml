@@ -43,7 +43,7 @@
     - name: "Template env files for pod | {{ _trireme_pod.pod }}"  # noqa risky-file-permissions
       register: __trireme_env_files
       no_log: "{{ trireme_no_log_override|ternary(false, true) }}"
-      loop: "{{ _trireme_pod.env_templates }}"
+      loop: "{{ _trireme_pod.env_templates | d([]) }}"
       loop_control:
         loop_var: _trireme_env
         label: "{{ _trireme_env.dest | d (_trireme_env.src) }}"

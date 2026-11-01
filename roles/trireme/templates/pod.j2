@@ -1,14 +1,16 @@
 # THIS FILE MANAGED BY ANSIBLE
 [Unit]
 Description={{ _tpm.metadata.description }}
-{% with _unit =  _tpm.spec.iniSections.unit %}
-{% include 'includes/1.j2' %}
-{% endwith %}
+{% if  _tpm.spec.iniSections.unit is defined %}
+{%  with _i =  _tpm.spec.iniSections.unit %}
+{%    include 'includes/1.j2' %}
+{%  endwith %}
+{% endif %}
 
 [Pod]
-ServiceName=pod-{{ _trireme_pod.metadata.name }}
-{% with _port = _tpm.spec.publishPort %}
-{%  if _port is defined %}
+ServiceName=pod-{{ _tpm.metadata.name }}
+{% if  _tpm.spec.publishPort is defined %}
+{%  with _port = _tpm.spec.publishPort %}
 {%    if _port | type_debug == 'list' %}
 {%	for item in _port %}
 PublishPort={{ item }}
@@ -16,17 +18,21 @@ PublishPort={{ item }}
 {%    else %}
 PublishPort={{ _port }}
 {%    endif %}
-{%  endif %}
-{% endwith %}
-{% with _unit =  _tpm.spec.iniSections.pod %}
-{% include 'includes/1.j2' %}
-{% endwith %}
+{%  endwith %}
+{% endif %}
+{% if  _tpm.spec.iniSections.pod is defined %}
+{%  with _i =  _tpm.spec.iniSections.pod %}
+{%    include 'includes/1.j2' %}
+{%  endwith %}
+{% endif %}
 PodmanArgs=--exit-policy=continue
+{% if  _tpm.spec.iniSections.service is defined %}
 
 [Service]
-{% with _unit =  _tpm.spec.iniSections.service %}
-{% include 'includes/1.j2' %}
-{% endwith %}
+{%  with _i =  _tpm.spec.iniSections.service %}
+{%    include 'includes/1.j2' %}
+{%  endwith %}
+{% endif %}
 
 [Install]
 WantedBy=default.target
