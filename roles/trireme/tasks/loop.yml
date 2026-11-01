@@ -1,8 +1,8 @@
 ---
 - name: "Set env and cfg dir path fact | {{ _trireme_pod.pod }}"
   set_fact:
-    _trireme_pod_cfg_dir: "/var/lib/trireme/{{ _trireme_pod.user.name }}/{{ _trireme_pod.pod }}"
-    _trireme_pod_user_quadlet_dir: "/var/lib/trireme/{{ _trireme_pod.user.name }}/quadlets/{{ _trireme_pod.pod }}"
+    _trireme_pod_cfg_dir: "{{ trireme_homes_basedir }}/{{ _trireme_pod.user.name }}/{{ _trireme_pod.pod }}"
+    _trireme_pod_user_quadlet_dir: "{{ trireme_homes_basedir }}/{{ _trireme_pod.user.name }}/quadlets/{{ _trireme_pod.pod }}"
 
 - name: "Read pod manifest | {{ _trireme_pod.pod }}"
   include_vars:

@@ -10,7 +10,8 @@
 
 - name: Create homes basedir
   file:
-    path: /var/lib/trireme
+    path: "{{ trireme_homes_basedir }}"
+    state: directory
     owner: root
     group: root
     mode: "0755"

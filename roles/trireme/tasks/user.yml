@@ -3,7 +3,7 @@
   user:
     name: "{{ _trireme_pod_user.name }}"
     comment: "{{ trireme__cn }} ansible role"
-    home: "/var/lib/trireme/{{ _trireme_pod_user.name }}"
+    home: "{{ trireme_homes_basedir }}/{{ _trireme_pod_user.name }}"
     uid: "{{ _trireme_pod_user.uid | d(omit) }}"
     shell: /bin/bash
     system: true
@@ -26,7 +26,7 @@
 
 - name: "Create quadlets dir for user {{ _trireme_pod_user.name }}"
   file:
-    path: "/var/lib/trireme/{{ _trireme_pod_user.name }}/quadlets"
+    path: "{{ trireme_homes_basedir }}/{{ _trireme_pod_user.name }}/quadlets"
     state: directory
     owner: "{{ _trireme_pod_user.name }}"
     group: "{{ _trireme_pod_user.name }}"

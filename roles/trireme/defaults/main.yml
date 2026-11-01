@@ -1,3 +1,4 @@
 ---
 trireme_no_log_override: "{{ lookup('env', 'ANSIBLE_NO_LOG_OVERRIDE')|d(false, true)|bool }}"
+trireme_homes_basedir: /var/lib/trireme
 ...
