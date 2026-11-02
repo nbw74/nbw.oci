@@ -1,9 +1,9 @@
 ---
 argument_specs:
   main:
-    short_description: The main entry point for the trireme role.
+    short_description: The main entry point for the triere role.
     options:
-      trireme_pods:
+      triere_pods:
         type: list
         elements: dict
         options:

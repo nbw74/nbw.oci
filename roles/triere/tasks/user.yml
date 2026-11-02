@@ -1,34 +1,34 @@
 ---
-- name: "Create or update pod user {{ _trireme_pod_user.name }}"
+- name: "Create or update pod user {{ _triere_pod_user.name }}"
   user:
-    name: "{{ _trireme_pod_user.name }}"
+    name: "{{ _triere_pod_user.name }}"
     comment: "Created by {{ ansible_role_name }} Ansible role"
-    home: "{{ trireme_homes_basedir }}/{{ _trireme_pod_user.name }}"
-    uid: "{{ _trireme_pod_user.uid | d(omit) }}"
-    shell: "{{ _trireme_pod_user.shell | d('/bin/bash') }}"
+    home: "{{ triere_homes_basedir }}/{{ _triere_pod_user.name }}"
+    uid: "{{ _triere_pod_user.uid | d(omit) }}"
+    shell: "{{ _triere_pod_user.shell | d('/bin/bash') }}"
     system: true
 
-- name: "Get lingering status for user {{ _trireme_pod_user.name }}"
-  register: __trireme_linger_stat
+- name: "Get lingering status for user {{ _triere_pod_user.name }}"
+  register: __triere_linger_stat
   stat:
-    path: "/var/lib/systemd/linger/{{ _trireme_pod_user.name }}"
+    path: "/var/lib/systemd/linger/{{ _triere_pod_user.name }}"
     get_attributes: false
     get_checksum: false
     get_mime: false
 
-- name: "Enable lingering for user {{ _trireme_pod_user.name }}"
-  when: not __trireme_linger_stat.stat.exists
+- name: "Enable lingering for user {{ _triere_pod_user.name }}"
+  when: not __triere_linger_stat.stat.exists
   command:
     argv:
       - loginctl
       - enable-linger
-      - "{{ _trireme_pod_user.name }}"
+      - "{{ _triere_pod_user.name }}"
 
-- name: "Create quadlets dir for user {{ _trireme_pod_user.name }}"
+- name: "Create quadlets dir for user {{ _triere_pod_user.name }}"
   file:
-    path: "{{ trireme_homes_basedir }}/{{ _trireme_pod_user.name }}/quadlets"
+    path: "{{ triere_homes_basedir }}/{{ _triere_pod_user.name }}/quadlets"
     state: directory
-    owner: "{{ _trireme_pod_user.name }}"
-    group: "{{ _trireme_pod_user.name }}"
+    owner: "{{ _triere_pod_user.name }}"
+    group: "{{ _triere_pod_user.name }}"
     mode: "0750"
 ...

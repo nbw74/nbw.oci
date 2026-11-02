@@ -1,123 +1,123 @@
 ---
-- name: "Set env and cfg dir path fact | {{ _trireme_pod.pod }}"
+- name: "Set env and cfg dir path fact | {{ _triere_pod.pod }}"
   set_fact:
-    _trireme_pod_cfg_dir: "{{ trireme_homes_basedir }}/{{ _trireme_pod.user.name }}/{{ _trireme_pod.pod }}"
-    _trireme_pod_user_quadlet_dir: "{{ trireme_homes_basedir }}/{{ _trireme_pod.user.name }}/quadlets/{{ _trireme_pod.pod }}"
+    _triere_pod_cfg_dir: "{{ triere_homes_basedir }}/{{ _triere_pod.user.name }}/{{ _triere_pod.pod }}"
+    _triere_pod_user_quadlet_dir: "{{ triere_homes_basedir }}/{{ _triere_pod.user.name }}/quadlets/{{ _triere_pod.pod }}"
 
-- name: "Read pod manifest | {{ _trireme_pod.pod }}"
+- name: "Read pod manifest | {{ _triere_pod.pod }}"
   include_vars:
     file: "{{ item }}"
     name: _tpm
   with_first_found:
     - paths:
-        - "{{ inventory_dir }}/trireme/pods"
-        - "{{ inventory_dir }}/trireme/pod"
+        - "{{ inventory_dir }}/triere/pods"
+        - "{{ inventory_dir }}/triere/pod"
       files:
-        - "{{ _trireme_pod.pod }}.yml"
-        - "{{ _trireme_pod.pod }}.yaml"
+        - "{{ _triere_pod.pod }}.yml"
+        - "{{ _triere_pod.pod }}.yaml"
 
-- name: "Assert that pod name is consistent between filename and metadata | {{ _trireme_pod.pod }}"
+- name: "Assert that pod name is consistent between filename and metadata | {{ _triere_pod.pod }}"
   assert:
     that:
-      - "_trireme_pod.pod == _tpm.metadata.name"
-    fail_msg: "Pod name mismatch: filename='{{ _trireme_pod.pod }}' metadata='{{ _tpm.metadata.name }}'"
+      - "_triere_pod.pod == _tpm.metadata.name"
+    fail_msg: "Pod name mismatch: filename='{{ _triere_pod.pod }}' metadata='{{ _tpm.metadata.name }}'"
 
-- name: "Create env / cfg dir and quadlet dir | {{ _trireme_pod.pod }}"
+- name: "Create env / cfg dir and quadlet dir | {{ _triere_pod.pod }}"
   loop:
-    - "{{ _trireme_pod_cfg_dir }}"
-    - "{{ _trireme_pod_user_quadlet_dir }}"
+    - "{{ _triere_pod_cfg_dir }}"
+    - "{{ _triere_pod_user_quadlet_dir }}"
   file:
     path: "{{ item }}"
     state: directory
-    owner: "{{ _trireme_pod.user.name }}"
-    group: "{{ _trireme_pod.user.name }}"
+    owner: "{{ _triere_pod.user.name }}"
+    group: "{{ _triere_pod.user.name }}"
     mode: "0750"
 
 - name: Module defaults block
   module_defaults:
     template:
-      owner: "{{ _trireme_pod.user.name }}"
-      group: "{{ _trireme_pod.user.name }}"
+      owner: "{{ _triere_pod.user.name }}"
+      group: "{{ _triere_pod.user.name }}"
       mode: "0640"
   block:
-    - name: "Template env files for pod | {{ _trireme_pod.pod }}"  # noqa risky-file-permissions
-      register: __trireme_env_files
-      no_log: "{{ trireme_no_log_override|ternary(false, true) }}"
-      loop: "{{ _trireme_pod.env_templates | d([]) }}"
+    - name: "Template env files for pod | {{ _triere_pod.pod }}"  # noqa risky-file-permissions
+      register: __triere_env_files
+      no_log: "{{ triere_no_log_override|ternary(false, true) }}"
+      loop: "{{ _triere_pod.env_templates | d([]) }}"
       loop_control:
-        loop_var: _trireme_env
-        label: "{{ _trireme_env.dest | d (_trireme_env.src) }}"
+        loop_var: _triere_env
+        label: "{{ _triere_env.dest | d (_triere_env.src) }}"
       template:
-        src: "{{ inventory_dir }}/trireme/env/{{ _trireme_env }}.j2"
-        dest: "{{ _trireme_pod_cfg_dir }}/{{ _trireme_env.dest | d(_trireme_env.src) }}.env"
+        src: "{{ inventory_dir }}/triere/env/{{ _triere_env }}.j2"
+        dest: "{{ _triere_pod_cfg_dir }}/{{ _triere_env.dest | d(_triere_env.src) }}.env"
 
-    - name: "Template images unit-files | {{ _trireme_pod.pod }}"  # noqa risky-file-permissions
+    - name: "Template images unit-files | {{ _triere_pod.pod }}"  # noqa risky-file-permissions
       loop: "{{ _tpm.spec.containers | map(attribute='image') | list | unique }}"
       loop_control:
         loop_var: _img
       template:
         src: image.j2
-        dest: "{{ _trireme_pod_user_quadlet_dir }}/{{ _tpm.metadata.name }}-{{ (_img | hash('sha1'))[:8] }}.image"
+        dest: "{{ _triere_pod_user_quadlet_dir }}/{{ _tpm.metadata.name }}-{{ (_img | hash('sha1'))[:8] }}.image"
 
-    - name: "Template containers unit-files | {{ _trireme_pod.pod }}"  # noqa risky-file-permissions
+    - name: "Template containers unit-files | {{ _triere_pod.pod }}"  # noqa risky-file-permissions
       loop: "{{ _tpm.spec.containers }}"
       loop_control:
         loop_var: _tcm
         label: "{{ _tcm.name }}"
       template:
         src: container.j2
-        dest: "{{ _trireme_pod_user_quadlet_dir }}/{{ _tpm.metadata.name }}-{{ _tcm.name }}.container"
+        dest: "{{ _triere_pod_user_quadlet_dir }}/{{ _tpm.metadata.name }}-{{ _tcm.name }}.container"
 
-    - name: "Template pod unit-file | {{ _trireme_pod.pod }}"  # noqa risky-file-permissions
+    - name: "Template pod unit-file | {{ _triere_pod.pod }}"  # noqa risky-file-permissions
       template:
         src: pod.j2
-        dest: "{{ _trireme_pod_user_quadlet_dir }}/{{ _trireme_pod.pod }}.pod"
+        dest: "{{ _triere_pod_user_quadlet_dir }}/{{ _triere_pod.pod }}.pod"
 
     - name: Network conditional block
       when: _tpm.spec.network is defined
       block:
-        - name: "Read network manifest | {{ _trireme_pod.pod }}"
+        - name: "Read network manifest | {{ _triere_pod.pod }}"
           include_vars:
             file: "{{ item }}"
             name: _tnm
           with_first_found:
             - paths:
-                - "{{ inventory_dir }}/trireme/networks"
-                - "{{ inventory_dir }}/trireme/network"
+                - "{{ inventory_dir }}/triere/networks"
+                - "{{ inventory_dir }}/triere/network"
               files:
                 - "{{ _tpm.spec.network }}.yml"
                 - "{{ _tpm.spec.network }}.yaml"
               skip: true
 
-        - name: "Template network unit-file | {{ _trireme_pod.pod }}"  # noqa risky-file-permissions
+        - name: "Template network unit-file | {{ _triere_pod.pod }}"  # noqa risky-file-permissions
           template:
             src: network.j2
-            dest: "{{ _trireme_pod_user_quadlet_dir }}/{{ _tpm.spec.network }}.network"
+            dest: "{{ _triere_pod_user_quadlet_dir }}/{{ _tpm.spec.network }}.network"
 
 - name: Become section
-  become_user: "{{ _trireme_pod.user.name }}"
+  become_user: "{{ _triere_pod.user.name }}"
   become: true
   block:
-    - name: "Prune dangling images | {{ _trireme_pod.pod }}"
+    - name: "Prune dangling images | {{ _triere_pod.pod }}"
       containers.podman.podman_prune:
         image: true
         image_filters:
           dangling_only: true
 
-    - name: "Quadlet installed | {{ _trireme_pod.pod }}"
-      register: __trireme_quadlet
+    - name: "Quadlet installed | {{ _triere_pod.pod }}"
+      register: __triere_quadlet
       containers.podman.podman_quadlet:
-        src: "{{ _trireme_pod_user_quadlet_dir }}"
+        src: "{{ _triere_pod_user_quadlet_dir }}"
 
-    - name: "Print podman_quadlet module output | {{ _trireme_pod.pod }}"
-      when: __trireme_quadlet is changed
+    - name: "Print podman_quadlet module output | {{ _triere_pod.pod }}"
+      when: __triere_quadlet is changed
       changed_when: true
       debug:
-        var: __trireme_quadlet
+        var: __triere_quadlet
 
-    - name: "Service (re)started for pod changes update | {{ _trireme_pod.pod }}"
+    - name: "Service (re)started for pod changes update | {{ _triere_pod.pod }}"
       systemd_service:
         name: "pod-{{ _tpm.metadata.name }}.service"
-        state: "{{ (__trireme_env_files is changed) | ternary('restarted', 'started') }}"
-        scope: "{{ (_trireme_pod.user.name == 'root') | ternary('system', 'user') }}"
+        state: "{{ (__triere_env_files is changed) | ternary('restarted', 'started') }}"
+        scope: "{{ (_triere_pod.user.name == 'root') | ternary('system', 'user') }}"
 ...

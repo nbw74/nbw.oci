@@ -1,8 +1,8 @@
-= trireme
+= triere
 :toc: auto
 :source-language: yaml
 
-Trireme is an Ansible orchestrator for the Podman Quadlet
+Triere is an Ansible orchestrator for the Podman Quadlet
 
 == Requirements
 

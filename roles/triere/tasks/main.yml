@@ -10,25 +10,25 @@
 
 - name: Create homes basedir
   file:
-    path: "{{ trireme_homes_basedir }}"
+    path: "{{ triere_homes_basedir }}"
     state: directory
     owner: root
     group: root
     mode: "0755"
 
 - name: Include tasks for creating or updating pod users
-  loop: "{{ trireme_pods | map(attribute='user') | list | unique }}"
+  loop: "{{ triere_pods | map(attribute='user') | list | unique }}"
   loop_control:
-    loop_var: _trireme_pod_user
-    label: "{{ _trireme_pod_user.name }}"
+    loop_var: _triere_pod_user
+    label: "{{ _triere_pod_user.name }}"
   include_tasks:
     file: user.yml
 
 - name: Include main loop
-  loop: "{{ trireme_pods }}"
+  loop: "{{ triere_pods }}"
   loop_control:
-    loop_var: _trireme_pod
-    label: "{{ _trireme_pod.pod }}@{{ _trireme_pod.user }}"
+    loop_var: _triere_pod
+    label: "{{ _triere_pod.pod }}@{{ _triere_pod.user }}"
   include_tasks:
     file: loop.yml
 ...

@@ -16,5 +16,5 @@
   diff: true
 
   roles:
-    - nbw.oci.trireme
+    - nbw.oci.triere
 ...

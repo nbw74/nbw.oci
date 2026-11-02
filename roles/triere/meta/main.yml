@@ -1,7 +1,7 @@
 ---
 galaxy_info:
-  role_name: trireme
-  description: Trireme is an Ansible orchestrator for the Podman Quadlet
+  role_name: triere
+  description: Triere is an Ansible orchestrator for the Podman Quadlet
   company: NoCompany
   author: Nikolay Mesropyan
   min_ansible_version: "2.18"

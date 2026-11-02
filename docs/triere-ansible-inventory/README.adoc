@@ -1,0 +1,1 @@
+= Example Ansible inventory for nbw.oci.triere role

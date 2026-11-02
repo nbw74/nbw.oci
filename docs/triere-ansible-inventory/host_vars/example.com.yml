@@ -1,5 +1,5 @@
 ---
-trireme_pods:
+triere_pods:
   - pod: open-webui
     user:
       name: open-webui
