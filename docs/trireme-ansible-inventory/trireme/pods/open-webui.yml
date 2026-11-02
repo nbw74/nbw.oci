@@ -1,0 +1,24 @@
+---
+kind: Pod
+metadata:
+  name: open-webui
+  description: Open WebUI
+spec:
+  publishPort:
+    - 3000:8080
+  iniSections:
+    service:
+      restart: on-failure
+    unit:
+      after:
+        - network-online.target
+  containers:
+    - name: app
+      image: ghcr.io/open-webui/open-webui:0.9.6
+      env:
+        CHAT_STREAM_RESPONSE_CHUNK_MAX_BUFFER_SIZE: "20971520"
+      volumes:
+        podmanVolume:
+          - name: open-webui
+            mount: /app/backend/data
+...

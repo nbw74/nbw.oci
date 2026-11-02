@@ -1,0 +1,11 @@
+# vim: set ft=yaml.ansible:
+---
+- name: Apply trireme role to fe04
+  hosts: trireme
+  gather_subset: [ 'min' ]
+  become: true
+  diff: true
+
+  roles:
+    - nbw.oci.trireme
+...
