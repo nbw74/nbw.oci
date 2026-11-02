@@ -19,6 +19,9 @@ argument_specs:
                 required: true
               uid:
                 type: int
+              shell:
+                type: path
+                default: /bin/bash
           env_templates:
             type: list
             elements: dict

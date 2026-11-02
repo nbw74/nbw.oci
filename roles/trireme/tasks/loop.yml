@@ -51,10 +51,13 @@
         src: "{{ inventory_dir }}/trireme/env/{{ _trireme_env }}.j2"
         dest: "{{ _trireme_pod_cfg_dir }}/{{ _trireme_env.dest | d(_trireme_env.src) }}.env"
 
-    - name: "Template pod unit-file | {{ _trireme_pod.pod }}"  # noqa risky-file-permissions
+    - name: "Template images unit-files | {{ _trireme_pod.pod }}"  # noqa risky-file-permissions
+      loop: "{{ _tpm.spec.containers | map(attribute='image') | list | unique }}"
+      loop_control:
+        loop_var: _img
       template:
-        src: pod.j2
-        dest: "{{ _trireme_pod_user_quadlet_dir }}/{{ _trireme_pod.pod }}.pod"
+        src: image.j2
+        dest: "{{ _trireme_pod_user_quadlet_dir }}/{{ _tpm.metadata.name }}-{{ (_img | hash('sha1'))[:8] }}.image"
 
     - name: "Template containers unit-files | {{ _trireme_pod.pod }}"  # noqa risky-file-permissions
       loop: "{{ _tpm.spec.containers }}"
@@ -64,6 +67,11 @@
       template:
         src: container.j2
         dest: "{{ _trireme_pod_user_quadlet_dir }}/{{ _tpm.metadata.name }}-{{ _tcm.name }}.container"
+
+    - name: "Template pod unit-file | {{ _trireme_pod.pod }}"  # noqa risky-file-permissions
+      template:
+        src: pod.j2
+        dest: "{{ _trireme_pod_user_quadlet_dir }}/{{ _trireme_pod.pod }}.pod"
 
     - name: Network conditional block
       when: _tpm.spec.network is defined

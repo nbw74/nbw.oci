@@ -2,10 +2,10 @@
 - name: "Create or update pod user {{ _trireme_pod_user.name }}"
   user:
     name: "{{ _trireme_pod_user.name }}"
-    comment: "{{ trireme__cn }} ansible role"
+    comment: "Created by {{ ansible_role_name }} Ansible role"
     home: "{{ trireme_homes_basedir }}/{{ _trireme_pod_user.name }}"
     uid: "{{ _trireme_pod_user.uid | d(omit) }}"
-    shell: /bin/bash
+    shell: "{{ _trireme_pod_user.shell | d('/bin/bash') }}"
     system: true
 
 - name: "Get lingering status for user {{ _trireme_pod_user.name }}"

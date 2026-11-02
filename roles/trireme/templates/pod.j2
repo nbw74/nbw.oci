@@ -1,6 +1,11 @@
 # THIS FILE MANAGED BY ANSIBLE
 [Unit]
 Description={{ _tpm.metadata.description }}
+{% for _img in _tpm.spec.containers | map(attribute='image') | list | unique %}
+{% set _img_name =  _tpm.metadata.name ~ '-' ~ (_img | hash('sha1'))[:8] %}
+Wants={{ _img_name }}.image
+After={{ _img_name }}.image
+{% endfor %}
 {% if  _tpm.spec.iniSections.unit is defined %}
 {%  with _i =  _tpm.spec.iniSections.unit %}
 {%    include 'includes/1.j2' %}

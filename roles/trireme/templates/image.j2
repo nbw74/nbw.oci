@@ -1,0 +1,11 @@
+# THIS FILE MANAGED BY ANSIBLE
+[Unit]
+Description=Pull image {{ _img }}
+
+[Image]
+Image={{ _img }}
+Policy=missing
+ServiceName=image-{{ _tpm.metadata.name }}-{{ (_img | hash('sha1'))[:8] }}
+
+[Install]
+WantedBy=default.target
