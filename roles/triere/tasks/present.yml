@@ -10,121 +10,13 @@
     group: "{{ _triere_pod.user.name }}"
     mode: "0750"
 
-- name: Ensure that only required quadlet .app files is present
-  block:
-    - name: "Define list of all quadlet files | {{ _triere_pod.pod }}"
-      set_fact:
-        _triere_quadlet_files: [ "{{ _tpm.metadata.name }}.pod" ]
+- name: "Include reconciliation tasks | {{ _triere_pod.pod }}"
+  include_tasks:
+    file: present/recon.yml
 
-    - name: "Add .network file in the list | {{ _triere_pod.pod }}"
-      when: _tpm.spec.network is defined
-      set_fact:
-        _triere_quadlet_files: "{{ _triere_quadlet_files + [ _tpm.spec.network ~ '.network' ] }}"
-
-    - name: "Add .container files list | {{ _triere_pod.pod }}"
-      loop: "{{ _tpm.spec.containers }}"
-      loop_control:
-        loop_var: _tcm
-        label: "{{ _tcm.name }}"
-      set_fact:
-        _triere_quadlet_files: "{{ _triere_quadlet_files + [ _tpm.metadata.name ~ '-' ~ _tcm.name ~ '.container' ] }}"
-
-    - name: "Add .image files list | {{ _triere_pod.pod }}"
-      loop: "{{ _tpm.spec.containers | map(attribute='image') | list | unique }}"
-      loop_control:
-        loop_var: _img
-      set_fact:
-        _triere_quadlet_files: "{{ _triere_quadlet_files + [ _tpm.metadata.name ~ '-' ~ (_img | hash('sha1'))[:8] ~ '.image' ] }}"
-
-    - name: "Find existing quadlet files | {{ _triere_pod.pod }}"
-      register: __triere_find_app
-      find:
-        paths: "{{ _triere_pod_user_quadlet_dir }}"
-        file_type: file
-        recurse: false
-
-    - name: "Add path prefix to list items | {{ _triere_pod.pod }}"
-      set_fact:
-        _triere_quadlet_files_full_paths: "{{ [ _triere_pod_user_quadlet_dir ~ '/' ] | product(_triere_quadlet_files) | map('join') | list }}"
-
-    - name: "Print found files | {{ _triere_pod.pod }}"
-      debug:
-        verbosity: 1
-        var: __triere_find_app.files | map(attribute='path') | list
-
-    - name: "Print quadlet .app files list | {{ _triere_pod.pod }}"
-      debug:
-        verbosity: 1
-        var: _triere_quadlet_files_full_paths
-
-    - name: "Remove extra (unmanaged) files in the quadlet .app directory | {{ _triere_pod.pod }}"
-      loop: "{{ __triere_find_app.files|map(attribute='path') | difference(_triere_quadlet_files_full_paths) }}"
-      loop_control:
-        loop_var: _triere_extra
-      file:
-        path: "{{ _triere_extra }}"
-        state: absent
-
-- name: Module defaults block
-  module_defaults:
-    template:
-      owner: "{{ _triere_pod.user.name }}"
-      group: "{{ _triere_pod.user.name }}"
-      mode: "0640"
-  block:
-    - name: "Template env files for pod | {{ _triere_pod.pod }}"  # noqa risky-file-permissions
-      register: __triere_env_files
-      no_log: "{{ triere_no_log_override|ternary(false, true) }}"
-      loop: "{{ _triere_pod.env_templates | d([]) }}"
-      loop_control:
-        loop_var: _triere_env
-        label: "{{ _triere_env.dest | d (_triere_env.src) }}"
-      template:
-        src: "{{ inventory_dir }}/triere/env/{{ _triere_env }}.j2"
-        dest: "{{ _triere_pod_cfg_dir }}/{{ _triere_env.dest | d(_triere_env.src) }}.env"
-
-    - name: "Template images unit-files | {{ _triere_pod.pod }}"  # noqa risky-file-permissions
-      loop: "{{ _tpm.spec.containers | map(attribute='image') | list | unique }}"
-      loop_control:
-        loop_var: _img
-      template:
-        src: image.j2
-        dest: "{{ _triere_pod_user_quadlet_dir }}/{{ _tpm.metadata.name }}-{{ (_img | hash('sha1'))[:8] }}.image"
-
-    - name: "Template containers unit-files | {{ _triere_pod.pod }}"  # noqa risky-file-permissions
-      loop: "{{ _tpm.spec.containers }}"
-      loop_control:
-        loop_var: _tcm
-        label: "{{ _tcm.name }}"
-      template:
-        src: container.j2
-        dest: "{{ _triere_pod_user_quadlet_dir }}/{{ _tpm.metadata.name }}-{{ _tcm.name }}.container"
-
-    - name: "Template pod unit-file | {{ _triere_pod.pod }}"  # noqa risky-file-permissions
-      template:
-        src: pod.j2
-        dest: "{{ _triere_pod_user_quadlet_dir }}/{{ _triere_pod.pod }}.pod"
-
-    - name: Network conditional block
-      when: _tpm.spec.network is defined
-      block:
-        - name: "Read network manifest | {{ _triere_pod.pod }}"
-          include_vars:
-            file: "{{ item }}"
-            name: _tnm
-          with_first_found:
-            - paths:
-                - "{{ inventory_dir }}/triere/networks"
-                - "{{ inventory_dir }}/triere/network"
-              files:
-                - "{{ _tpm.spec.network }}.yml"
-                - "{{ _tpm.spec.network }}.yaml"
-              skip: true
-
-        - name: "Template network unit-file | {{ _triere_pod.pod }}"  # noqa risky-file-permissions
-          template:
-            src: network.j2
-            dest: "{{ _triere_pod_user_quadlet_dir }}/{{ _tpm.spec.network }}.network"
+- name: "Include templating tasks | {{ _triere_pod.pod }}"
+  include_tasks:
+    file: present/templates.yml
 
 - name: Become section
   become_user: "{{ _triere_pod.user.name }}"

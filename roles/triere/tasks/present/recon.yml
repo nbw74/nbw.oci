@@ -1,0 +1,56 @@
+---
+- name: "Define list of all quadlet files | {{ _triere_pod.pod }}"
+  set_fact:
+    _triere_quadlet_files: [ "{{ _tpm.metadata.name }}.pod" ]
+
+- name: "Add .network file in the list | {{ _triere_pod.pod }}"
+  when: _tpm.spec.network is defined
+  set_fact:
+    _triere_quadlet_files: "{{ _triere_quadlet_files + [ _tpm.spec.network ~ '.network' ] }}"
+
+- name: "Add .container files list | {{ _triere_pod.pod }}"
+  loop: "{{ _tpm.spec.containers }}"
+  loop_control:
+    loop_var: _tcm
+    label: "{{ _tcm.name }}"
+  set_fact:
+    _triere_quadlet_files: "{{ _triere_quadlet_files + [ _tpm.metadata.name ~ '-' ~ _tcm.name ~ '.container' ] }}"
+
+- name: "Add .image files list | {{ _triere_pod.pod }}"
+  loop: "{{ _tpm.spec.containers | map(attribute='image') | list | unique }}"
+  loop_control:
+    loop_var: _img
+  set_fact:
+    _triere_quadlet_files: "{{ _triere_quadlet_files + [ _tpm.metadata.name ~ '-' ~ (_img | hash('sha1'))[:8] ~ '.image' ] }}"
+
+- name: "Find existing quadlet files | {{ _triere_pod.pod }}"
+  register: __triere_find_app
+  find:
+    paths: "{{ _triere_pod_user_quadlet_dir }}"
+    file_type: file
+    recurse: false
+
+- name: "Add path prefix to list items | {{ _triere_pod.pod }}"
+  set_fact:
+    _triere_quadlet_files_full_paths: "{{ [ _triere_pod_user_quadlet_dir ~ '/' ] | product(_triere_quadlet_files) | map('join') | list }}"
+
+- name: "Print found files | {{ _triere_pod.pod }}"
+  changed_when: true
+  debug:
+    verbosity: 1
+    var: __triere_find_app.files | map(attribute='path') | list
+
+- name: "Print quadlet .app files list | {{ _triere_pod.pod }}"
+  changed_when: true
+  debug:
+    verbosity: 1
+    var: _triere_quadlet_files_full_paths
+
+- name: "Remove extra (unmanaged) files in the quadlet .app directory | {{ _triere_pod.pod }}"
+  loop: "{{ __triere_find_app.files|map(attribute='path') | difference(_triere_quadlet_files_full_paths) }}"
+  loop_control:
+    loop_var: _triere_extra
+  file:
+    path: "{{ _triere_extra }}"
+    state: absent
+...
