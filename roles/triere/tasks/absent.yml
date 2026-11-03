@@ -1,0 +1,62 @@
+---
+- name: Become and module_defaults section
+  become_user: "{{ _triere_pod.user.name }}"
+  become: true
+  module_defaults:
+    systemd_service:
+      state: stopped
+      scope: "{{ (_triere_pod.user.name == 'root') | ternary('system', 'user') }}"
+  block:
+    - name: "Get quadlets info | {{ _triere_pod.pod }}"
+      register: __triere_quadlets_info
+      containers.podman.podman_quadlet_info:
+        kinds:
+          - pod
+          - image
+          - network
+
+    - name: "Print quadlet info | {{ _triere_pod.pod }}"
+      changed_when: true
+      debug:
+        verbosity: 1
+        var: __triere_quadlets_info
+
+    - name: "Set fact about matched app | {{ _triere_pod.pod }}"
+      set_fact:
+        _triere_app: >-
+          {{ __triere_quadlets_info.quadlets | selectattr('App', 'match', '.' ~ _triere_pod.pod ~ '.app') }}
+
+    - name: "Pod service stopped | {{ _triere_pod.pod }}"
+      loop: "{{ _triere_app | selectattr('Name', 'search', '.pod') | map(attribute='UnitName') | list }}"
+      loop_control:
+        loop_var: _triere_app_pod
+      systemd_service:
+        name: "{{ _triere_app_pod }}"
+
+    - name: "Image services stopped | {{ _triere_pod.pod }}"
+      loop: "{{ _triere_app | selectattr('Name', 'search', '.image') | map(attribute='UnitName') | list }}"
+      loop_control:
+        loop_var: _triere_app_image
+      systemd_service:
+        name: "{{ _triere_app_image }}"
+
+    - name: "Network services stopped | {{ _triere_pod.pod }}"
+      loop: "{{ _triere_app | selectattr('Name', 'search', '.network') | map(attribute='UnitName') | list }}"
+      loop_control:
+        loop_var: _triere_app_network
+      systemd_service:
+        name: "{{ _triere_app_network }}"
+
+    - name: "Quadlet removed | {{ _triere_pod.pod }}"
+      register: __triere_quadlet_rm
+      containers.podman.podman_quadlet:
+        name: "{{ _triere_pod.pod }}.pod"
+        state: absent
+        force: false
+
+    - name: "Print podman_quadlet module output | {{ _triere_pod.pod }}"
+      when: __triere_quadlet_rm is changed
+      changed_when: true
+      debug:
+        var: __triere_quadlet_rm
+...

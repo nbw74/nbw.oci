@@ -31,4 +31,7 @@ argument_specs:
                 required: true
               dest:
                 type: str
+          state:
+            type: bool
+            default: true
 ...
