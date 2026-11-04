@@ -4,7 +4,8 @@ Description=Pull image {{ _img }}
 
 [Image]
 Image={{ _img }}
-Policy=missing
+{% set _img_policy = _tpm.spec.containers | selectattr('image', 'equalto', _img) | selectattr('autoUpdate', 'sameas', true) | length is truthy %}
+Policy={{ _img_policy | ternary('newer', 'missing') }}
 ServiceName=image-{{ _tpm.metadata.name }}-{{ (_img | hash('sha1'))[:8] }}
 
 [Install]

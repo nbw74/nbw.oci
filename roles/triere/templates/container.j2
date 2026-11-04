@@ -10,6 +10,9 @@ Description={{ _tcm.description | d(_tpm.metadata.description) }}
 [Container]
 Pod={{ _tpm.metadata.name }}.pod
 Image={{ _tcm.image }}
+{% if _tcm.autoUpdate | d(false) %}
+AutoUpdate=registry
+{% endif %}
 ContainerName={{ _tpm.metadata.name }}-{{ _tcm.name }}
 ServiceName=container-{{ _tpm.metadata.name }}-{{ _tcm.name }}
 {% if _tcm.env is defined %}
@@ -18,7 +21,7 @@ Environment={{ key }}={{ value }}
 {%  endfor %}
 {% endif %}
 {% for _file in _tcm.envFile | d([]) %}
-EnvironmentFile={{ _triere_pod_cfg_dir }}/{{ _file }}.env"
+EnvironmentFile={{ _triere_pod_cfg_dir }}/{{ _file }}.env
 {% endfor %}
 {% if _tcm.volumes is defined %}
 {%  for _path in _tcm.volumes.hostPath | d([]) %}
