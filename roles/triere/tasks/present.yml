@@ -2,7 +2,7 @@
 - name: "Create env / cfg dir and quadlet dir | {{ _triere_pod.pod }}"
   loop:
     - "{{ _triere_pod_cfg_dir }}"
-    - "{{ _triere_pod_user_quadlet_dir }}"
+    - "{{ _triere_pod_app_dir }}"
   file:
     path: "{{ item }}"
     state: directory
@@ -18,6 +18,15 @@
   include_tasks:
     file: present/templates.yml
 
+- name: "Include tasks for creating hostPath directories | {{ _triere_pod.pod }}"
+  when: _tcm.volumes.hostPath | d([]) | length is truthy
+  loop: "{{ _tpm.spec.containers }}"
+  loop_control:
+    loop_var: _tcm
+    label: "{{ _tcm.name }}"
+  include_tasks:
+    file: present/volumes.yml
+
 - name: Become section
   become_user: "{{ _triere_pod.user.name }}"
   become: true
@@ -31,7 +40,7 @@
     - name: "Quadlet installed | {{ _triere_pod.pod }}"
       register: __triere_quadlet
       containers.podman.podman_quadlet:
-        src: "{{ _triere_pod_user_quadlet_dir }}"
+        src: "{{ _triere_pod_app_dir }}"
 
     - name: "Print podman_quadlet module output | {{ _triere_pod.pod }}"
       when: __triere_quadlet is changed

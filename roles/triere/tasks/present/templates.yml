@@ -23,7 +23,7 @@
         loop_var: _img
       template:
         src: image.j2
-        dest: "{{ _triere_pod_user_quadlet_dir }}/{{ _tpm.metadata.name }}-{{ (_img | hash('sha1'))[:8] }}.image"
+        dest: "{{ _triere_pod_app_dir }}/{{ _tpm.metadata.name }}-{{ (_img | hash('sha1'))[:8] }}.image"
 
     - name: "Template containers unit-files | {{ _triere_pod.pod }}"  # noqa risky-file-permissions
       loop: "{{ _tpm.spec.containers }}"
@@ -32,12 +32,12 @@
         label: "{{ _tcm.name }}"
       template:
         src: container.j2
-        dest: "{{ _triere_pod_user_quadlet_dir }}/{{ _tpm.metadata.name }}-{{ _tcm.name }}.container"
+        dest: "{{ _triere_pod_app_dir }}/{{ _tpm.metadata.name }}-{{ _tcm.name }}.container"
 
     - name: "Template pod unit-file | {{ _triere_pod.pod }}"  # noqa risky-file-permissions
       template:
         src: pod.j2
-        dest: "{{ _triere_pod_user_quadlet_dir }}/{{ _triere_pod.pod }}.pod"
+        dest: "{{ _triere_pod_app_dir }}/{{ _triere_pod.pod }}.pod"
 
     - name: Network conditional block
       when: _tpm.spec.network is defined
@@ -58,5 +58,5 @@
         - name: "Template network unit-file | {{ _triere_pod.pod }}"  # noqa risky-file-permissions
           template:
             src: network.j2
-            dest: "{{ _triere_pod_user_quadlet_dir }}/{{ _tpm.spec.network }}.network"
+            dest: "{{ _triere_pod_app_dir }}/{{ _tpm.spec.network }}.network"
 ...

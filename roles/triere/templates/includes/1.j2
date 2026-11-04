@@ -1,9 +1,9 @@
 {%    for key, value in _i | dictsort %}
 {%	if value | type_debug == 'list' %}
 {%	  for _sub in value %}
-{{ key | capitalize }}={{ _sub }}
+{{ key[0] | upper ~ key[1:] }}={{ _sub }}
 {%	  endfor %}
 {%	else %}
-{{ key | capitalize }}={{ value|string }}
+{{ key[0] | upper ~ key[1:] }}={{ value|string }}
 {%	endif %}
 {%    endfor %}

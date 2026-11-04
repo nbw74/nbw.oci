@@ -26,13 +26,13 @@
 - name: "Find existing quadlet files | {{ _triere_pod.pod }}"
   register: __triere_find_app
   find:
-    paths: "{{ _triere_pod_user_quadlet_dir }}"
+    paths: "{{ _triere_pod_app_dir }}"
     file_type: file
     recurse: false
 
 - name: "Add path prefix to list items | {{ _triere_pod.pod }}"
   set_fact:
-    _triere_quadlet_files_full_paths: "{{ [ _triere_pod_user_quadlet_dir ~ '/' ] | product(_triere_quadlet_files) | map('join') | list }}"
+    _triere_quadlet_files_full_paths: "{{ [ _triere_pod_app_dir ~ '/' ] | product(_triere_quadlet_files) | map('join') | list }}"
 
 - name: "Print found files | {{ _triere_pod.pod }}"
   changed_when: true

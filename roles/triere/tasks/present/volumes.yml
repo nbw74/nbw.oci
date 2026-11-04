@@ -1,0 +1,23 @@
+---
+- name: "Get volume path presence | {{ _triere_pod.pod }}"
+  register: __triere_hostpath_vols
+  loop: "{{ _tcm.volumes.hostPath }}"
+  loop_control:
+    loop_var: _tcm_volume
+    label: "{{ _tcm_volume.path }}"
+  stat:
+    path: "{{ _tcm_volume.path }}"
+
+- name: "Create hostPath directories if not exists | {{ _triere_pod.pod }}"
+  when: not _tcm_volume_stat.stat.exists
+  loop: "{{ __triere_hostpath_vols.results }}"
+  loop_control:
+    loop_var: _tcm_volume_stat
+    label: "{{ _tcm_volume_stat.invocation.module_args.path }}"
+  file:
+    state: directory
+    path: "{{ _tcm_volume_stat.invocation.module_args.path }}"
+    owner: "{{ _triere_pod.user.name }}"
+    group: "{{ _triere_pod.user.name }}"
+    mode: "0755"
+...

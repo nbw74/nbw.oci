@@ -1,8 +1,8 @@
 ---
 - name: "Set env and cfg dir path fact | {{ _triere_pod.pod }}"
   set_fact:
-    _triere_pod_cfg_dir: "{{ triere_homes_basedir }}/{{ _triere_pod.user.name }}/{{ _triere_pod.pod }}"
-    _triere_pod_user_quadlet_dir: "{{ triere_homes_basedir }}/{{ _triere_pod.user.name }}/quadlets/{{ _triere_pod.pod }}"
+    _triere_pod_cfg_dir: "{{ triere_homes_basedir }}/{{ _triere_pod.user.name }}/.local/lib/triere/cfg/{{ _triere_pod.pod }}"
+    _triere_pod_app_dir: "{{ triere_homes_basedir }}/{{ _triere_pod.user.name }}/.local/lib/triere/apps/{{ _triere_pod.pod }}"
 
 - name: "Read pod manifest | {{ _triere_pod.pod }}"
   include_vars:
