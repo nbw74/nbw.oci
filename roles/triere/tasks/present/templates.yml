@@ -12,10 +12,10 @@
       loop: "{{ _triere_pod.env_templates | d([]) }}"
       loop_control:
         loop_var: _triere_env
-        label: "{{ _triere_env.dest | d (_triere_env.src) }}"
+        label: "{{ _triere_env.dest | d (_triere_env.name) }}"
       template:
-        src: "{{ inventory_dir }}/triere/env/{{ _triere_env }}.j2"
-        dest: "{{ _triere_pod_cfg_dir }}/{{ _triere_env.dest | d(_triere_env.src) }}.env"
+        src: "{{ inventory_dir }}/triere/env/{{ _triere_env.name }}.j2"
+        dest: "{{ _triere_pod_cfg_dir }}/{{ _triere_env.dest | d(_triere_env.name) }}.env"
 
     - name: "Template images unit-files | {{ _triere_pod.pod }}"  # noqa risky-file-permissions
       loop: "{{ _tpm.spec.containers | map(attribute='image') | list | unique }}"

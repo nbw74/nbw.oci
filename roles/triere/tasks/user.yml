@@ -26,12 +26,4 @@
           - loginctl
           - enable-linger
           - "{{ _triere_pod_user.name }}"
-
-- name: "Create quadlet apps dir for user {{ _triere_pod_user.name }}"
-  file:
-    path: "{{ triere_homes_basedir }}/{{ _triere_pod_user.name }}/.local/lib/triere"
-    state: directory
-    owner: "{{ _triere_pod_user.name }}"
-    group: "{{ _triere_pod_user.name }}"
-    mode: "0750"
 ...

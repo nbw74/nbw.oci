@@ -55,7 +55,7 @@
         state: "{{ (__triere_env_files is changed) | ternary('restarted', 'started') }}"
         scope: "{{ (_triere_pod.user.name == 'root') | ternary('system', 'user') }}"
 
-    - name: "Print systemd_service module output | {{ _triere_pod.pod }}"
+    - name: "Print status change from systemd_service module output | {{ _triere_pod.pod }}"
       when: __triere_quadlet_svc is changed
       changed_when: true
       debug:
