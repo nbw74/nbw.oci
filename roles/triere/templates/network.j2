@@ -3,6 +3,7 @@
 Description={{ _tnm.metadata.description }}
 
 [Network]
+NetworkName={{ _tnm.metadata.name }}
 Subnet={{ _tnm.spec.subnet }}
 {% if  _tnm.spec.iniSections.network is defined %}
 {%  with _i =  _tnm.iniSections.network %}

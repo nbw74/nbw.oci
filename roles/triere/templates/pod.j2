@@ -14,6 +14,9 @@ After={{ _img_name }}.image
 
 [Pod]
 ServiceName=pod-{{ _tpm.metadata.name }}
+{% if  _tpm.spec.network is defined %}
+Network={{ _tpm.spec.network }}.network
+{% endif %}
 {% if  _tpm.spec.publishPort is defined %}
 {%  with _port = _tpm.spec.publishPort %}
 {%    if _port | type_debug == 'list' %}

@@ -48,10 +48,25 @@
       debug:
         var: __triere_quadlet
 
+    - name: "Run podman quadlet generator for dry-run check | {{ _triere_pod.pod }}"
+      register: __triere_generator_dryrun
+      changed_when: false
+      failed_when: false
+      command:
+        argv:
+          - "/usr/lib/systemd/{{ (_triere_pod.user.name == 'root') | ternary('system-generators/podman-system', 'user-generators/podman-user') }}-generator"
+          - --dryrun
+
+    - name: "Print stderr and exit in case of failure | {{ _triere_pod.pod }}"
+      when: __triere_generator_dryrun.rc != 0
+      fail:
+        msg: "{{ __triere_generator_dryrun.stderr }}"
+
     - name: "Service (re)started for pod changes update | {{ _triere_pod.pod }}"
       register: __triere_quadlet_svc
       systemd_service:
         name: "pod-{{ _tpm.metadata.name }}.service"
+        # daemon_reload: "{{ __triere_quadlet is changed }}"
         state: "{{ (__triere_env_files is changed) | ternary('restarted', 'started') }}"
         scope: "{{ (_triere_pod.user.name == 'root') | ternary('system', 'user') }}"
 
