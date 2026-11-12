@@ -67,7 +67,7 @@
       systemd_service:
         name: "pod-{{ _tpm.metadata.name }}.service"
         # daemon_reload: "{{ __triere_quadlet is changed }}"
-        state: "{{ (__triere_env_files is changed) | ternary('restarted', 'started') }}"
+        state: "{{ (__triere_env_files is changed or _triere_cfg_changed | d(false)) | ternary('restarted', 'started') }}"
         scope: "{{ (_triere_pod.user.name == 'root') | ternary('system', 'user') }}"
 
     - name: "Print status change from systemd_service module output | {{ _triere_pod.pod }}"

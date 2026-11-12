@@ -1,0 +1,24 @@
+---
+- name: "Get cfg vol file presence | {{ _triere_pod.pod ~ ':' ~ _triere_cfg.src }}"
+  register: __triere_cfg_vol
+  stat:
+    path: "{{ _triere_pod_cfg_dir }}/{{ _triere_cfg.name | d(_triere_cfg.src | basename) }}"
+    get_attributes: false
+    get_checksum: false
+    get_mime: false
+
+- name: "Template cfg vol file | {{ _triere_pod.pod ~ ':' ~ _triere_cfg.src }}"
+  register: __triere_cfg_template
+  no_log: "{{ triere_no_log_override | ternary(false, true) }}"
+  template:
+    src: "{{ inventory_dir }}/triere/cfg/{{ _triere_cfg.src }}.j2"
+    dest: "{{ _triere_pod_cfg_dir }}/{{ _triere_cfg.name | d(_triere_cfg.src | basename) }}"
+    owner: "{{ __triere_cfg_vol.stat.exists | ternary(omit,  _triere_pod.user.name) }}"
+    group: "{{ __triere_cfg_vol.stat.exists | ternary(omit,  _triere_pod.user.name) }}"
+    mode: "{{ __triere_cfg_vol.stat.mode | d('0644') }}"
+
+- name: "Raise flag if cfg vol file changed | {{ _triere_pod.pod ~ ':' ~ _triere_cfg.src }}"
+  when: __triere_cfg_template is changed
+  set_fact:
+    _triere_cfg_changed: true
+...

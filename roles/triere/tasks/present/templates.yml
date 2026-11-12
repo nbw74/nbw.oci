@@ -1,4 +1,12 @@
 ---
+- name: "Include cfgFile templating tasks | {{ _triere_pod.pod }}"
+  loop: "{{ _triere_pod.cfg_templates | d([]) }}"
+  loop_control:
+    loop_var: _triere_cfg
+    label: "{{ _triere_cfg.name | d(_triere_cfg.src) }}"
+  include_tasks:
+    file: cfgfile.yml
+
 - name: Module defaults block
   module_defaults:
     template:
@@ -12,10 +20,10 @@
       loop: "{{ _triere_pod.env_templates | d([]) }}"
       loop_control:
         loop_var: _triere_env
-        label: "{{ _triere_env.dest | d (_triere_env.name) }}"
+        label: "{{ _triere_env.name | d(_triere_env.src) }}"
       template:
-        src: "{{ inventory_dir }}/triere/env/{{ _triere_env.name }}.j2"
-        dest: "{{ _triere_pod_cfg_dir }}/{{ _triere_env.dest | d(_triere_env.name) }}.env"
+        src: "{{ inventory_dir }}/triere/env/{{ _triere_env.src }}.j2"
+        dest: "{{ _triere_pod_cfg_dir }}/{{ _triere_env.name | d(_triere_env.src | basename) }}.env"
 
     - name: "Template images unit-files | {{ _triere_pod.pod }}"  # noqa risky-file-permissions
       loop: "{{ _tpm.spec.containers | map(attribute='image') | list | unique }}"

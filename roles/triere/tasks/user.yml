@@ -9,7 +9,7 @@
         home: "{{ triere_homes_basedir }}/{{ _triere_pod_user.name }}"
         uid: "{{ _triere_pod_user.uid | d(omit) }}"
         shell: "{{ _triere_pod_user.shell | d('/bin/bash') }}"
-        system: true
+        system: false
 
     - name: "Get lingering status for user {{ _triere_pod_user.name }}"
       register: __triere_linger_stat
