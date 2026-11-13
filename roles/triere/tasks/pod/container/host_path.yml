@@ -1,0 +1,15 @@
+---
+- name: "Get volume path presence | {{ _triere_pod.pod ~ ':' ~ _tcm.name ~ ':' ~ _tcm_volume.path }}"
+  register: __tcmv
+  stat:
+    path: "{{ _tcm_volume.path }}"
+
+- name: "Create hostPath directory if not exists | {{ _triere_pod.pod ~ ':' ~ _tcm.name ~ ':' ~ _tcm_volume.path }}"
+  when: not __tcmv.stat.exists
+  file:
+    state: directory
+    path: "{{ _tcm_volume.path }}"
+    owner: "{{ _triere_pod.user.name }}"
+    group: "{{ _triere_pod.user.name }}"
+    mode: "0755"
+...

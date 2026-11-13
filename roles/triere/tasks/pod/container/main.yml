@@ -5,7 +5,7 @@
     loop_var: _tcm_volume
     label: "{{ _tcm_volume.path }}"
   include_tasks:
-    file: volumes.yml
+    file: host_path.yml
 
 - name: "Include cfgFile templating tasks | {{ _triere_pod.pod ~ ':' ~ _tcm.name }}"
   loop: "{{ _tcm.volumes.cfgFile | d([]) }}"
@@ -13,5 +13,21 @@
     loop_var: _tcm_cfg
     label: "{{ _tcm_cfg.src }}"
   include_tasks:
-    file: cfgfile.yml
+    file: cfg_file.yml
+
+- name: "Include env files templating tasks | {{ _triere_pod.pod ~ ':' ~ _tcm.name }}"
+  loop: "{{ _tcm.envFile | d([]) }}"
+  loop_control:
+    loop_var: _tcm_env
+    label: "{{ _tcm_env }}"
+  include_tasks:
+    file: env_file.yml
+
+- name: "Template container unit-file | {{ _triere_pod.pod ~ ':' ~ _tcm.name }}"
+  template:
+    src: container.j2
+    dest: "{{ _triere_pod_app_dir }}/{{ _tpm.metadata.name }}-{{ _tcm.name }}.container"
+    owner: "{{ _triere_pod.user.name }}"
+    group: "{{ _triere_pod.user.name }}"
+    mode: "0640"
 ...

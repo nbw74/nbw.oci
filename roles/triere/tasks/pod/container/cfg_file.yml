@@ -1,0 +1,28 @@
+---
+- name: "Get cfg vol file presence | {{ _triere_pod.pod ~ ':' ~ _tcm.name ~ ':' ~ _tcm_cfg.src }}"
+  register: __tcmc
+  stat:
+    path: "{{ _triere_pod_cfg_dir }}/{{ _tcm_cfg.src | basename }}"
+    get_attributes: false
+    get_checksum: false
+    get_mime: false
+
+- name: "Template cfg vol file | {{ _triere_pod.pod ~ ':' ~ _tcm.name ~ ':' ~ _tcm_cfg.src }}"
+  register: __tcmc_template
+  no_log: "{{ triere_no_log_override | ternary(false, true) }}"
+  template:
+    src: "{{ lookup('first_found', _tcmc_findme) }}"
+    dest: "{{ _triere_pod_cfg_dir }}/{{ _tcm.name }}-{{ _tcm_cfg.src | basename }}"
+    owner: "{{ __tcmc.stat.exists | ternary(omit,  _triere_pod.user.name) }}"
+    group: "{{ __tcmc.stat.exists | ternary(omit,  _triere_pod.user.name) }}"
+    mode: "{{ __tcmc.stat.mode | d('0644') }}"
+  vars:
+    _tcmc_findme:
+      - "{{ inventory_dir }}/triere/cfg/{{ _tcm_cfg.src }}.j2"
+      - "{{ inventory_dir }}/triere/cfg/{{ _tcm_cfg.src }}"
+
+- name: "Raise flag if cfg vol file changed | {{ _triere_pod.pod ~ ':' ~ _tcm.name ~ ':' ~ _tcm_cfg.src }}"
+  when: __tcmc_template is changed
+  set_fact:
+    _triere_cfg_changed: true
+...

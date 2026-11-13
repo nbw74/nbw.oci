@@ -1,0 +1,20 @@
+---
+- name: "Template env file | {{ _triere_pod.pod ~ ':' ~ _tcm.name ~ ':' ~ _tcm_env }}"
+  no_log: "{{ triere_no_log_override | ternary(false, true) }}"
+  register: __tcme_template
+  template:
+    src: "{{ lookup('first_found', _tcme_findme) }}"
+    dest: "{{ _triere_pod_env_dir }}/{{ _tcm.name }}-{{ _tcme | basename | splitext | first }}"
+    owner: "{{  _triere_pod.user.name }}"
+    group: "{{  _triere_pod.user.name }}"
+    mode: "0644"
+  vars:
+    _tcme_findme:
+      - "{{ inventory_dir }}/triere/env/{{ _tcm_env }}.j2"
+      - "{{ inventory_dir }}/triere/env/{{ _tcm_env }}"
+
+- name: "Raise flag if env file changed | {{ _triere_pod.pod ~ ':' ~ _tcm.name ~ ':' ~ _tcm_env }}"
+  when: __tcme_template is changed
+  set_fact:
+    _triere_env_changed: true
+...

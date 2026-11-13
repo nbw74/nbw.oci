@@ -30,5 +30,5 @@
     loop_var: _triere_pod
     label: "{{ _triere_pod.pod }}@{{ _triere_pod.user }}"
   include_tasks:
-    file: pod/loop.yml
+    file: loop.yml
 ...

@@ -20,12 +20,12 @@ ServiceName=container-{{ _tpm.metadata.name }}-{{ _tcm.name }}
 Environment={{ key }}={{ value }}
 {%  endfor %}
 {% endif %}
-{% for _file in _tcm.envFile | d([]) %}
-EnvironmentFile={{ _triere_pod_cfg_dir }}/{{ _file }}.env
+{% for _tcme in _tcm.envFile | d([]) %}
+EnvironmentFile={{ _triere_pod_env_dir }}/{{ _tcm.name }}-{{ _tcme | basename | splitext | first }}
 {% endfor %}
 {% if _tcm.volumes is defined %}
 {%  for _cfg in _tcm.volumes.cfgFile | d([]) %}
-Volume={{ _triere_pod_cfg_dir }}/{{ _cfg.name }}:{{ _cfg.mountPath }}{{ (_cfg.options is defined) | ternary(':' ~ _cfg.options | d(None), None) }}
+Volume={{ _triere_pod_cfg_dir }}/{{ _tcm.name }}-{{ _cfg.src | basename }}:{{ _cfg.mountPath }}{{ (_cfg.options is defined) | ternary(':' ~ _cfg.options | d(None), None) }}
 {%  endfor %}
 {%  for _path in _tcm.volumes.hostPath | d([]) %}
 Volume={{ _path.path }}:{{ _path.mountPath }}{{ (_path.options is defined) | ternary(':' ~ _path.options | d(None), None) }}

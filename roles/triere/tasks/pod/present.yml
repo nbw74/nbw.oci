@@ -1,7 +1,8 @@
 ---
-- name: "Create env / cfg dir and quadlet dir | {{ _triere_pod.pod }}"
+- name: "Create env, cfg and app dir | {{ _triere_pod.pod }}"
   loop:
     - "{{ _triere_pod_cfg_dir }}"
+    - "{{ _triere_pod_env_dir }}"
     - "{{ _triere_pod_app_dir }}"
   file:
     path: "{{ item }}"
@@ -66,7 +67,7 @@
       systemd_service:
         name: "pod-{{ _tpm.metadata.name }}.service"
         # daemon_reload: "{{ __triere_quadlet is changed }}"
-        state: "{{ (__triere_env_files is changed or _triere_cfg_changed | d(false)) | ternary('restarted', 'started') }}"
+        state: "{{ (_triere_env_changed | d(false) or _triere_cfg_changed | d(false)) | ternary('restarted', 'started') }}"
         scope: "{{ (_triere_pod.user.name == 'root') | ternary('system', 'user') }}"
 
     - name: "Print status change from systemd_service module output | {{ _triere_pod.pod }}"

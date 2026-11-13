@@ -6,17 +6,6 @@
       group: "{{ _triere_pod.user.name }}"
       mode: "0640"
   block:
-    - name: "Template env files for pod | {{ _triere_pod.pod }}"  # noqa risky-file-permissions
-      register: __triere_env_files
-      no_log: "{{ triere_no_log_override|ternary(false, true) }}"
-      loop: "{{ _triere_pod.env_templates | d([]) }}"
-      loop_control:
-        loop_var: _triere_env
-        label: "{{ _triere_env.name | d(_triere_env.src) }}"
-      template:
-        src: "{{ inventory_dir }}/triere/env/{{ _triere_env.src }}.j2"
-        dest: "{{ _triere_pod_cfg_dir }}/{{ _triere_env.name | d(_triere_env.src | basename) }}.env"
-
     - name: "Template images unit-files | {{ _triere_pod.pod }}"  # noqa risky-file-permissions
       loop: "{{ _tpm.spec.containers | map(attribute='image') | list | unique }}"
       loop_control:
@@ -24,15 +13,6 @@
       template:
         src: image.j2
         dest: "{{ _triere_pod_app_dir }}/{{ _tpm.metadata.name }}-{{ (_img | hash('sha1'))[:8] }}.image"
-
-    - name: "Template containers unit-files | {{ _triere_pod.pod }}"  # noqa risky-file-permissions
-      loop: "{{ _tpm.spec.containers }}"
-      loop_control:
-        loop_var: _tcm
-        label: "{{ _tcm.name }}"
-      template:
-        src: container.j2
-        dest: "{{ _triere_pod_app_dir }}/{{ _tpm.metadata.name }}-{{ _tcm.name }}.container"
 
     - name: "Template pod unit-file | {{ _triere_pod.pod }}"  # noqa risky-file-permissions
       template:
