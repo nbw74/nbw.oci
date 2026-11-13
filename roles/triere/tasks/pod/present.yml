@@ -12,18 +12,22 @@
 
 - name: "Include reconciliation tasks | {{ _triere_pod.pod }}"
   include_tasks:
-    file: present/recon.yml
+    file: recon.yml
 
 - name: "Include templating tasks | {{ _triere_pod.pod }}"
   include_tasks:
-    file: present/templates.yml
+    file: templates.yml
 
-- name: "Include tasks for creating hostPath directories | {{ _triere_pod.pod }}"
-  when: _tcm.volumes.hostPath | d([]) | length is truthy
+- name: "Include tasks loop for containers | {{ _triere_pod.pod }}"
   loop: "{{ _tpm.spec.containers }}"
   loop_control:
     loop_var: _tcm
     label: "{{ _tcm.name }}"
+  include_tasks:
+    file: container/main.yml
+
+- name: "Include tasks for creating hostPath directories | {{ _triere_pod.pod }}"
+  when: _tcm.volumes.hostPath | d([]) | length is truthy
   include_tasks:
     file: present/volumes.yml
 

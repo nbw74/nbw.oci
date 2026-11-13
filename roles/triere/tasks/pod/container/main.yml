@@ -1,0 +1,6 @@
+---
+- name: "Include tasks for creating hostPath directories | {{ _triere_pod.pod ~ ':' ~ _tcm.name }}"
+  when: _tcm.volumes.hostPath | d([]) | length is truthy
+  include_tasks:
+    file: volumes.yml
+...
