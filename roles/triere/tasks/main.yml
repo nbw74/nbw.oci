@@ -24,11 +24,11 @@
   include_tasks:
     file: user.yml
 
-- name: Include main loop
+- name: Include Pod loop
   loop: "{{ triere_pods }}"
   loop_control:
     loop_var: _triere_pod
     label: "{{ _triere_pod.pod }}@{{ _triere_pod.user }}"
   include_tasks:
-    file: loop.yml
+    file: pod/loop.yml
 ...

@@ -24,5 +24,5 @@
 
 - name: "Include present/absent tasks | {{ _triere_pod.pod }}"
   include_tasks:
-    file: "{{ _triere_pod.state | d(true) | ternary('present', 'absent') }}.yml"
+    file: "pod/{{ _triere_pod.state | d(true) | ternary('present', 'absent') }}.yml"
 ...
