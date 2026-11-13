@@ -22,24 +22,8 @@ argument_specs:
               shell:
                 type: path
                 default: /bin/bash
-          cfg_templates:
-            type: list
-            elements: dict
-            options:
-              src:
-                type: str
-                required: true
-              name:
-                type: str
-          env_templates:
-            type: list
-            elements: dict
-            options:
-              src:
-                type: str
-                required: true
-              name:
-                type: str
+          vars:
+            type: dict
           state:
             type: bool
             default: true
