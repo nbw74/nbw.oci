@@ -1,6 +1,17 @@
 ---
 - name: "Include tasks for creating hostPath directories | {{ _triere_pod.pod ~ ':' ~ _tcm.name }}"
-  when: _tcm.volumes.hostPath | d([]) | length is truthy
+  loop: "{{ _tcm.volumes.hostPath | d([]) }}"
+  loop_control:
+    loop_var: _tcm_volume
+    label: "{{ _tcm_volume.path }}"
   include_tasks:
     file: volumes.yml
+
+- name: "Include cfgFile templating tasks | {{ _triere_pod.pod ~ ':' ~ _tcm.name }}"
+  loop: "{{ _tcm.volumes.cfgFile | d([]) }}"
+  loop_control:
+    loop_var: _tcm_cfg
+    label: "{{ _tcm_cfg.src }}"
+  include_tasks:
+    file: cfgfile.yml
 ...

@@ -26,11 +26,6 @@
   include_tasks:
     file: container/main.yml
 
-- name: "Include tasks for creating hostPath directories | {{ _triere_pod.pod }}"
-  when: _tcm.volumes.hostPath | d([]) | length is truthy
-  include_tasks:
-    file: present/volumes.yml
-
 - name: Become section
   become_user: "{{ _triere_pod.user.name }}"
   become: true
