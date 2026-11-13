@@ -2,7 +2,6 @@
 - name: "Create env, cfg and app dir | {{ _triere_pod.pod }}"
   loop:
     - "{{ _triere_pod_cfg_dir }}"
-    - "{{ _triere_pod_env_dir }}"
     - "{{ _triere_pod_app_dir }}"
   file:
     path: "{{ item }}"

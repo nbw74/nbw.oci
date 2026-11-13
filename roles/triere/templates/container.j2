@@ -21,7 +21,7 @@ Environment={{ key }}={{ value }}
 {%  endfor %}
 {% endif %}
 {% for _tcme in _tcm.envFile | d([]) %}
-EnvironmentFile={{ _triere_pod_env_dir }}/{{ _tcm.name }}-{{ _tcme | basename | splitext | first }}
+EnvironmentFile={{ _triere_pod_cfg_dir }}/{{ _tcm.name }}-{{ _tcme | basename | splitext | first }}.env
 {% endfor %}
 {% if _tcm.volumes is defined %}
 {%  for _cfg in _tcm.volumes.cfgFile | d([]) %}

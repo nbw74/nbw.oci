@@ -4,7 +4,7 @@
   register: __tcme_template
   template:
     src: "{{ lookup('first_found', _tcme_findme) }}"
-    dest: "{{ _triere_pod_env_dir }}/{{ _tcm.name }}-{{ _tcme | basename | splitext | first }}"
+    dest: "{{ _triere_pod_cfg_dir }}/{{ _tcm.name }}-{{ _tcm_env | basename | splitext | first }}.env"
     owner: "{{  _triere_pod.user.name }}"
     group: "{{  _triere_pod.user.name }}"
     mode: "0644"

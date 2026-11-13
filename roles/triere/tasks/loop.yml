@@ -1,9 +1,10 @@
 ---
-- name: "Set env and cfg dir path fact | {{ _triere_pod.pod }}"
+- name: "Set path and trigger facts | {{ _triere_pod.pod }}"
   set_fact:
     _triere_pod_cfg_dir: "{{ triere_homes_basedir }}/{{ _triere_pod.user.name }}/.local/lib/triere/cfg/{{ _triere_pod.pod }}"
-    _triere_pod_env_dir: "{{ triere_homes_basedir }}/{{ _triere_pod.user.name }}/.local/lib/triere/env/{{ _triere_pod.pod }}"
-    _triere_pod_app_dir: "{{ triere_homes_basedir }}/{{ _triere_pod.user.name }}/.local/lib/triere/app/{{ _triere_pod.pod }}"
+    _triere_pod_app_dir: "{{ triere_homes_basedir }}/{{ _triere_pod.user.name }}/.local/lib/triere/apps/{{ _triere_pod.pod }}"
+    _triere_cfg_changed: false
+    _triere_env_changed: false
 
 - name: "Read pod manifest | {{ _triere_pod.pod }}"
   include_vars:
