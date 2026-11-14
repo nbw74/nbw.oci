@@ -17,6 +17,13 @@ argument_specs:
               name:
                 type: str
                 required: true
+              omit_password_lock:
+                type: bool
+                default: false
+              password:
+                type: str
+              password_hash:
+                type: str
               uid:
                 type: int
               shell:
