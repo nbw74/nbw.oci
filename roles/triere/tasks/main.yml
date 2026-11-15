@@ -8,6 +8,16 @@
   package:
     name: podman-plugins
 
+- name: OS-dependent tasks included
+  include_tasks:
+    file: "{{ item }}"
+  with_first_found:
+    - files:
+      - "{{ ansible_os_family|lower }}-{{ ansible_distribution_major_version }}.yml"
+      paths:
+      - "{{ role_path }}/tasks"
+      skip: true
+
 - name: Create homes basedir
   file:
     path: "{{ triere_homes_basedir }}"

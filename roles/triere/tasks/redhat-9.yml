@@ -1,0 +1,12 @@
+---
+- name: Fix missing dbus vars
+  copy:
+    dest: "/etc/profile.d/{{ triere__cn }}.sh"
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      # FILE MANAGED BY ANSIBLE
+      export XDG_RUNTIME_DIR=/run/user/$(id -u)
+      export DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"
+...
