@@ -34,12 +34,14 @@ PublishPort={{ _port }}
 {%    endif %}
 {%  endwith %}
 {% endif %}
+{% if _tpm.spec.iniSections.pod.podmanArgs is not defined %}
+PodmanArgs=--exit-policy=continue
+{% endif %}
 {% if  _tpm.spec.iniSections.pod is defined %}
 {%  with _i =  _tpm.spec.iniSections.pod %}
 {%    include 'includes/1.j2' %}
 {%  endwith %}
 {% endif %}
-PodmanArgs=--exit-policy=continue
 {% if _tpm.spec.iniSections.service is defined %}
 
 [Service]
