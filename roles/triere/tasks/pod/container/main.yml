@@ -24,6 +24,7 @@
     file: env_file.yml
 
 - name: "Template container unit-file | {{ _triere_pod.pod ~ ':' ~ _tcm.name }}"
+  when: not _triere_pod.immutable | d(false)
   template:
     src: container.j2
     dest: "{{ _triere_pod_app_dir }}/{{ _tpm.metadata.name }}-{{ _tcm.name }}.container"

@@ -14,8 +14,14 @@ After={{ _img_name }}.image
 
 [Pod]
 ServiceName=pod-{{ _tpm.metadata.name }}
-{% if  _tpm.spec.network is defined %}
+{% if _tpm.spec.iniSections.pod.network is not defined %}
+{%  if  _tpm.spec.network is defined %}
 Network={{ _tpm.spec.network }}.network
+{%  elif _triere_pod.user.name == 'root' %}
+Network=bridge
+{%  else %}
+Network=pasta:--ipv4-only
+{%  endif %}
 {% endif %}
 {% if  _tpm.spec.publishPort is defined %}
 {%  with _port = _tpm.spec.publishPort %}
@@ -34,7 +40,7 @@ PublishPort={{ _port }}
 {%  endwith %}
 {% endif %}
 PodmanArgs=--exit-policy=continue
-{% if  _tpm.spec.iniSections.service is defined %}
+{% if _tpm.spec.iniSections.service is defined %}
 
 [Service]
 {%  with _i =  _tpm.spec.iniSections.service %}
