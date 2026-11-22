@@ -24,10 +24,10 @@
     file: env_file.yml
 
 - name: "Template container unit-file | {{ _triere_pod.pod ~ ':' ~ _tcm.name }}"
-  when: not _triere_pod.immutable | d(false)
   template:
     src: container.j2
     dest: "{{ _triere_pod_app_dir }}/{{ _tpm.metadata.name }}-{{ _tcm.name }}.container"
+    force: "{{ _triere_pod.immutable | d(false) | ternary(false, true) }}"
     owner: "{{ _triere_pod.user.name }}"
     group: "{{ _triere_pod.user.name }}"
     mode: "0640"

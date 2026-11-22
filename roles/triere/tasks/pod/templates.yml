@@ -15,10 +15,10 @@
         dest: "{{ _triere_pod_app_dir }}/{{ _tpm.metadata.name }}-{{ (_img | hash('sha1'))[:8] }}.image"
 
     - name: "Template pod unit-file | {{ _triere_pod.pod }}"  # noqa risky-file-permissions
-      when: not _triere_pod.immutable | d(false)
       template:
         src: pod.j2
         dest: "{{ _triere_pod_app_dir }}/{{ _triere_pod.pod }}.pod"
+        force: "{{ _triere_pod.immutable | d(false) | ternary(false, true) }}"
 
     - name: Network conditional block
       when: _tpm.spec.network is defined
@@ -37,8 +37,8 @@
               skip: true
 
         - name: "Template network unit-file | {{ _triere_pod.pod }}"  # noqa risky-file-permissions
-          when: not _triere_pod.immutable | d(false)
           template:
             src: network.j2
             dest: "{{ _triere_pod_app_dir }}/{{ _tpm.spec.network }}.network"
+            force: "{{ _triere_pod.immutable | d(false) | ternary(false, true) }}"
 ...
