@@ -17,7 +17,7 @@ ContainerName={{ _tpm.metadata.name }}-{{ _tcm.name }}
 ServiceName=container-{{ _tpm.metadata.name }}-{{ _tcm.name }}
 {% if _tcm.env is defined %}
 {%  for key, value in _tcm.env | dictsort %}
-Environment={{ key }}={{ value }}
+Environment="{{ key }}={{ value | replace('"', '\\"') | replace('\n', '\\n\\\n') }}"
 {%  endfor %}
 {% endif %}
 {% for _tcme in _tcm.envFile | d([]) %}
