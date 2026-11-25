@@ -26,11 +26,24 @@
     group: root
     mode: "0755"
 
-- name: Include tasks for creating or updating pod users
-  loop: "{{ triere_pods | map(attribute='user') | list | unique }}"
+- name: Set intermediate variables I
+  set_fact:
+    _triere_simple_users: "{{ triere_pods | map(attribute='user') | list | unique }}"
+    _triere_users_custom_settings: "{{ triere_users_custom_settings | map(attribute='user') | list }}"
+
+- name: Set intermediate variable II
+  set_fact:
+    _triere_simple_users_trimmed: "{{ _triere_simple_users | difference(_triere_users_custom_settings) }}"
+
+- name: Set intermediate variable III
+  set_fact:
+    _triere_simple_users_kv: "{{ _triere_simple_users_trimmed | map('community.general.dict_kv', 'user') | list }}"
+
+- name: Include tasks for creating or updating pod users (exclude superuser)
+  loop: "{{ triere_users_custom_settings | union(_triere_simple_users_kv) | rejectattr('user', 'eq', 'root') | list }}"
   loop_control:
     loop_var: _triere_pod_user
-    label: "{{ _triere_pod_user.name }}"
+    label: "{{ _triere_pod_user.user }}"
   include_tasks:
     file: user.yml
 

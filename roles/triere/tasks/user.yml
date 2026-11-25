@@ -1,47 +1,54 @@
 ---
-- name: Noroot block
-  when: "_triere_pod_user.name != 'root'"
+- name: Module defaults block
   module_defaults:
     user:
-      name: "{{ _triere_pod_user.name }}"
+      name: "{{ _triere_pod_user.user }}"
       comment: "Created by {{ ansible_role_name }} Ansible role"
-      home: "{{ triere_homes_basedir }}/{{ _triere_pod_user.name }}"
+      home: "{{ triere_homes_basedir }}/{{ _triere_pod_user.user }}"
       uid: "{{ _triere_pod_user.uid | d(omit) }}"
       shell: "{{ _triere_pod_user.shell | d('/bin/bash') }}"
       system: false
   block:
-    - name: "Create or update pod user with plaintext password {{ _triere_pod_user.name }}"
+    - name: "Create or update pod user with plaintext password {{ _triere_pod_user.user }}"
       when: _triere_pod_user.password is defined
       user:
         password: "{{ _triere_pod_user.password | password_hash('sha512', (inventory_hostname | md5)[:6]) }}"
         update_password: always
 
-    - name: "Create or update pod user with hashed password {{ _triere_pod_user.name }}"
+    - name: "Create or update pod user with hashed password {{ _triere_pod_user.user }}"
       when: _triere_pod_user.password_hash is defined
       user:
         password: "{{ _triere_pod_user.password_hash }}"
         update_password: always
 
-    - name: "Create or update pod user with no password {{ _triere_pod_user.name }}"
+    - name: "Create or update pod user with no password {{ _triere_pod_user.user }}"
       when:
         - _triere_pod_user.password is not defined
         - _triere_pod_user.password_hash is not defined
       user:
         password_lock: "{{ omit_password_lock | d(false) | ternary(omit, true) }}"
 
-    - name: "Get lingering status for user {{ _triere_pod_user.name }}"
+    - name: "Get lingering status for user {{ _triere_pod_user.user }}"
       register: __triere_linger_stat
       stat:
-        path: "/var/lib/systemd/linger/{{ _triere_pod_user.name }}"
+        path: "/var/lib/systemd/linger/{{ _triere_pod_user.user }}"
         get_attributes: false
         get_checksum: false
         get_mime: false
 
-    - name: "Enable lingering for user {{ _triere_pod_user.name }}"
+    - name: "Enable lingering for user {{ _triere_pod_user.user }}"
       when: not __triere_linger_stat.stat.exists
       command:
         argv:
           - loginctl
           - enable-linger
-          - "{{ _triere_pod_user.name }}"
+          - "{{ _triere_pod_user.user }}"
+
+    - name: "Manage podman.socket for user {{ _triere_pod_user.user }}"
+      become_user: "{{ _triere_pod_user.user }}"
+      become: true
+      systemd_service:
+        name: podman.socket
+        enabled: "{{ _triere_pod_user.podman_socket_enabled | d(false) }}"
+        scope: user
 ...

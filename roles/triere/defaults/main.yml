@@ -1,4 +1,5 @@
 ---
 triere_no_log_override: "{{ lookup('env', 'ANSIBLE_NO_LOG_OVERRIDE')|d(false, true)|bool }}"
 triere_homes_basedir: /var/lib/triere
+triere_users_custom_settings: []
 ...

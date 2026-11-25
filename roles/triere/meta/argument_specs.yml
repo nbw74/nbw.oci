@@ -11,24 +11,8 @@ argument_specs:
             type: str
             required: true
           user:
-            type: dict
+            type: str
             required: true
-            options:
-              name:
-                type: str
-                required: true
-              omit_password_lock:
-                type: bool
-                default: false
-              password:
-                type: str
-              password_hash:
-                type: str
-              uid:
-                type: int
-              shell:
-                type: path
-                default: /bin/bash
           vars:
             type: dict
           immutable:
@@ -39,4 +23,27 @@ argument_specs:
           state:
             type: bool
             default: true
+
+      triere_users_custom_settings:
+        type: list
+        elements: dict
+        options:
+          user:
+            type: str
+            required: true
+          omit_password_lock:
+            type: bool
+            default: false
+          password:
+            type: str
+          password_hash:
+            type: str
+          podman_socket_enabled:
+            type: bool
+            default: false
+          uid:
+            type: int
+          shell:
+            type: path
+            default: /bin/bash
 ...

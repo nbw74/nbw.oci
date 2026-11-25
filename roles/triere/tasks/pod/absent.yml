@@ -1,11 +1,11 @@
 ---
 - name: Become and module_defaults section
-  become_user: "{{ _triere_pod.user.name }}"
+  become_user: "{{ _triere_pod.user }}"
   become: true
   module_defaults:
     systemd_service:
       state: stopped
-      scope: "{{ (_triere_pod.user.name == 'root') | ternary('system', 'user') }}"
+      scope: "{{ (_triere_pod.user == 'root') | ternary('system', 'user') }}"
   block:
     - name: "Get quadlets info | {{ _triere_pod.pod }}"
       register: __triere_quadlets_info

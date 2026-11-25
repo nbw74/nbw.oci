@@ -28,7 +28,7 @@
     src: container.j2
     dest: "{{ _triere_pod_app_dir }}/{{ _tpm.metadata.name }}-{{ _tcm.name }}.container"
     force: "{{ _triere_pod.immutable | d(false) | ternary(false, true) }}"
-    owner: "{{ _triere_pod.user.name }}"
-    group: "{{ _triere_pod.user.name }}"
+    owner: "{{ _triere_pod.user }}"
+    group: "{{ _triere_pod.user }}"
     mode: "0640"
 ...

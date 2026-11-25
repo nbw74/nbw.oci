@@ -2,8 +2,8 @@
 - name: Module defaults block
   module_defaults:
     template:
-      owner: "{{ _triere_pod.user.name }}"
-      group: "{{ _triere_pod.user.name }}"
+      owner: "{{ _triere_pod.user }}"
+      group: "{{ _triere_pod.user }}"
       mode: "0640"
   block:
     - name: "Template images unit-files | {{ _triere_pod.pod }}"  # noqa risky-file-permissions

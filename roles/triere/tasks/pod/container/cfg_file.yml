@@ -13,8 +13,8 @@
   template:
     src: "{{ lookup('first_found', _tcmc_findme) }}"
     dest: "{{ _triere_pod_cfg_dir }}/{{ _tcm.name }}-{{ _tcm_cfg.src | basename }}"
-    owner: "{{ __tcmc.stat.exists | ternary(omit,  _triere_pod.user.name) }}"
-    group: "{{ __tcmc.stat.exists | ternary(omit,  _triere_pod.user.name) }}"
+    owner: "{{ __tcmc.stat.exists | ternary(omit,  _triere_pod.user) }}"
+    group: "{{ __tcmc.stat.exists | ternary(omit,  _triere_pod.user) }}"
     mode: "{{ __tcmc.stat.mode | d('0644') }}"
   vars:
     _tcmc_findme:

@@ -5,8 +5,8 @@
   template:
     src: "{{ lookup('first_found', _tcme_findme) }}"
     dest: "{{ _triere_pod_cfg_dir }}/{{ _tcm.name }}-{{ _tcm_env | basename | splitext | first }}.env"
-    owner: "{{  _triere_pod.user.name }}"
-    group: "{{  _triere_pod.user.name }}"
+    owner: "{{  _triere_pod.user }}"
+    group: "{{  _triere_pod.user }}"
     mode: "0640"
   vars:
     _tcme_findme:

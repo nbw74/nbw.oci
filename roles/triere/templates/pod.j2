@@ -17,7 +17,7 @@ ServiceName=pod-{{ _tpm.metadata.name }}
 {% if _tpm.spec.iniSections.pod.network is not defined %}
 {%  if  _tpm.spec.network is defined %}
 Network={{ _tpm.spec.network }}.network
-{%  elif _triere_pod.user.name == 'root' %}
+{%  elif _triere_pod.user == 'root' %}
 Network=bridge
 {%  else %}
 Network=pasta:--ipv4-only
