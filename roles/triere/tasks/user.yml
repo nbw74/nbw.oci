@@ -50,5 +50,6 @@
       systemd_service:
         name: podman.socket
         enabled: "{{ _triere_pod_user.podman_socket_enabled | d(false) }}"
+        state: "{{ _triere_pod_user.podman_socket_enabled | d(false) | ternary('started', 'stopped') }}"
         scope: user
 ...
